@@ -19,12 +19,14 @@ CREATE TABLE IF NOT EXISTS items (
     type TEXT,
     name TEXT,
     description TEXT,
-    location TEXT,
+    latitude REAL,
+    longitude REAL,
     contact TEXT,
     image TEXT,
     date TEXT
 )
 """)
+
 conn.commit()
 
 # Gmail Setup
@@ -33,10 +35,10 @@ app_password = "ohehmwbnkjzgtxgg"  # App password
 
 recipients = [
     "23cse171@act.edu.in", # Tamil Selva
-    "23cse153@act.edu.in", # Sathyanesar
-    "23cse144@act.edu.in", # R Sanjay
-    "23cse135@act.edu.in", # Sam Prince
-    "kalarani.cse@act.edu.in" # Kalarani mam
+   # "23cse153@act.edu.in", # Sathyanesar
+    #"23cse144@act.edu.in", # R Sanjay
+    #"23cse135@act.edu.in", # Sam Prince
+    #"kalarani.cse@act.edu.in" # Kalarani mam
 ]
 
 # 📧 Send Email with Inline Image
@@ -117,29 +119,39 @@ def index():
 
 # 🧍 Lost Form
 @app.route('/lost', methods=['GET', 'POST'])
+@app.route('/lost', methods=['GET', 'POST'])
 def lost():
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
-        location = request.form['location']
+
+        manual_location = request.form.get('manual_location')
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
+
         contact = request.form['contact']
 
-        # ✅ Handle both file upload and camera capture
-        if 'camera_image' in request.form and request.form['camera_image']:
-            img_data = request.form['camera_image'].split(",")[1]
-            filename = f"camera_{datetime.now().strftime('%Y%m%d%H%M%S')}.png"
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            with open(filepath, "wb") as f:
-                f.write(base64.b64decode(img_data))
+        # Build location string for email
+        if manual_location:
+            location = manual_location
+        elif latitude and longitude:
+            location = f"Lat: {latitude}, Lng: {longitude}"
         else:
-            image = request.files['image']
-            filename = image.filename
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            image.save(filepath)
+            location = "Not specified"
+
+        # Handle image
+        image = request.files['image']
+        filename = image.filename
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(filepath)
 
         cursor.execute(
-            "INSERT INTO items (type, name, description, location, contact, image, date) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            ('Lost', name, description, location, contact, filename, datetime.now())
+            """
+            INSERT INTO items
+            (type, name, description, latitude, longitude, contact, image, date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ('Lost', name, description, latitude, longitude, contact, filename, datetime.now())
         )
         conn.commit()
 
@@ -154,25 +166,33 @@ def found():
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
-        location = request.form['location']
+
+        manual_location = request.form.get('manual_location')
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
+
         contact = request.form['contact']
 
-        # ✅ Handle both file upload and camera capture
-        if 'camera_image' in request.form and request.form['camera_image']:
-            img_data = request.form['camera_image'].split(",")[1]
-            filename = f"camera_{datetime.now().strftime('%Y%m%d%H%M%S')}.png"
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            with open(filepath, "wb") as f:
-                f.write(base64.b64decode(img_data))
+        # Build location string
+        if manual_location:
+            location = manual_location
+        elif latitude and longitude:
+            location = f"Lat: {latitude}, Lng: {longitude}"
         else:
-            image = request.files['image']
-            filename = image.filename
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            image.save(filepath)
+            location = "Not specified"
+
+        image = request.files['image']
+        filename = image.filename
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(filepath)
 
         cursor.execute(
-            "INSERT INTO items (type, name, description, location, contact, image, date) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            ('Found', name, description, location, contact, filename, datetime.now())
+            """
+            INSERT INTO items
+            (type, name, description, latitude, longitude, contact, image, date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ('Found', name, description, latitude, longitude, contact, filename, datetime.now())
         )
         conn.commit()
 
