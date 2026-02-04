@@ -96,29 +96,13 @@ body {
   }
 }
 
-/* ===== FINAL MOBILE FIXES ===== */
+/* Responsive title */
 @media (max-width: 576px) {
-
-  body {
-    padding: 0;
-    margin: 0;
-  }
-
-  h2 {
-    font-size: 1.5rem;
+  .team-title {
+    font-size: 1.8rem;
     text-align: center;
   }
-
-  .container {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .team-title {
-    font-size: 1.6rem;
-  }
 }
-
 
 /* Make navbar buttons wrap neatly */
 @media (max-width: 768px) {
@@ -153,14 +137,10 @@ body {
 }
 
 .splash-content img {
-    max-height: 150px;      /* controls height */
-    max-width: 80%;         /* responsive width */
-    width: auto;
+    width: 300px;
     height: auto;
     margin-bottom: 10px;
-    object-fit: contain;
 }
-
 
 .splash-content h3 {
     font-weight: bold;
