@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Report a Found Item</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+  <div class="mb-3">
+    <label class="form-label">Your Name</label>
+    <input type="text" class="form-control" name="name" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Item Description</label>
+    <textarea class="form-control" name="description" rows="3" required></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Location Found</label>
+    <input type="text" class="form-control" name="location" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Contact Info</label>
+    <input type="text" class="form-control" name="contact" required>
+  </div>
+
+  <!-- Image Upload Section -->
+  <div class="mb-3">
+    <label class="form-label">Item Image</label>
+
+    <!-- Hidden File Input -->
+    <input type="file"
+           id="fileInput"
+           name="image"
+           accept="image/*"
+           class="d-none"
+           onchange="previewImage(event)">
+
+    <!-- Hidden Camera Input -->
+    <input type="file"
+           id="cameraInput"
+           name="image"
+           accept="image/*"
+           capture="environment"
+           class="d-none"
+           onchange="previewImage(event)">
+
+    <!-- Buttons -->
+    <div class="d-flex gap-2">
+      <button type="button"
+              class="btn btn-outline-primary"
+              onclick="document.getElementById('fileInput').click()">
+        📁 Choose File
+      </button>
+
+      <button type="button"
+              class="btn btn-outline-success"
+              onclick="document.getElementById('cameraInput').click()">
+        📷 Open Camera
+      </button>
+    </div>
+  </div>
+
+  <!-- Image Preview -->
+  <div class="mb-3 text-center">
+    <img id="preview"
+         src=""
+         alt="Image Preview"
+         class="img-thumbnail"
+         style="max-width:200px; display:none;">
+  </div>
+
+  <button type="submit" class="btn btn-danger">Submit</button>
+</form>
+
+<!-- Preview Script -->
+<script>
+function previewImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    const img = document.getElementById("preview");
+    img.src = reader.result;
+    img.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+
+{% endblock %}
